@@ -1,0 +1,27 @@
+#Selects para teste
+select * from vw_acha_user;
+select * from tbl_usuarios;
+
+select * from tbl_cliente;
+select * from vw_mostra_cliente;
+
+select * from tbl_animal;
+select * from vw_todos_animais;
+
+select* from tbl_funcionario;
+SELECT * FROM vw_todos_funcionarios;
+
+select * from tbl_compras;
+SELECT * FROM vw_todas_compras;
+
+select * from tbl_servico;
+SELECT * from vw_todos_servicos;
+
+select * from tbl_animal_servico;
+select * from vw_animal_servico;
+
+select * from tbl_servico_funcionario;
+select * from vw_acha_servico_funcionario;
+
+select * from tbl_log_update_usuarios;
+select * from tbl_log_update_cliente;

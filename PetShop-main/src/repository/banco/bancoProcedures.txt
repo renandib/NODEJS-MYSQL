@@ -1,0 +1,413 @@
+#Criação das procedures
+#Usuário
+
+DELIMITER 	$$
+CREATE PROCEDURE sp_registra_user (p_email varchar(45), p_senha varchar(64), p_nome varchar(30))
+	begin
+		insert into tbl_usuarios(email, senha, nome)
+        values(p_email, p_senha, p_nome);
+	end $$
+DELIMITER ;
+
+call sp_registra_user("petsho@gmail.com", "1234", "pet");
+
+DELIMITER 	$$
+CREATE PROCEDURE sp_atualiza_user (p_id_user int(11), p_email varchar(45), p_senha varchar(64), p_nome varchar(30))
+	begin
+		update tbl_usuarios
+        set 
+        email = p_email, 
+        senha = p_senha, 
+        nome = p_nome
+        where id_usuario = p_id_user;
+	end $$
+DELIMITER ;
+
+call sp_atualiza_user(1, "petsho@gmail.com", "1234", "pethop");
+
+DELIMITER 	$$
+CREATE PROCEDURE sp_delete_user (p_id_user int(11))
+	begin
+		update tbl_usuarios
+        set 
+        estatus = 1
+        where id_usuario = p_id_user;
+	end $$
+DELIMITER ;
+
+call sp_delete_user(1);
+
+DELIMITER 	$$
+CREATE PROCEDURE sp_acha_user (p_id_user int(11))
+	begin
+        select * from tbl_usuarios
+        where id_usuario = p_id_user;
+	end $$
+DELIMITER ;
+
+call sp_acha_user(1);
+
+################################333
+#Cliente
+delimiter $$
+CREATE PROCEDURE sp_insere_cliente (p_nome varchar(45), p_cpf varchar(11) , p_nascimento date , p_sexo varchar (2) , p_telefone varchar (10) , p_email varchar(25)) 
+	begin
+		insert into tbl_cliente(nome, cpf, nascimento, sexo, telefone, email)
+			VALUES(
+			p_nome, 
+			p_cpf, 
+			p_nascimento, 
+			p_sexo , 
+			p_telefone,  
+			p_email 
+			);
+			select * from tbl_cliente where cpf = p_cpf; # AQUI ESTA MOSTRANDO PRO FUNCIONARIO, QUAL CLIENTE EU INSERI ==> COMO SE FOSSE UMA CONFERENCIA
+	end $$ 
+delimiter ;
+
+call sp_insere_cliente ("petSHop","123456-123","2021/12/01","M","7070-7070","petshop@gmail.com");
+
+delimiter $$
+	CREATE PROCEDURE sp_update_cliente (p_nome varchar(45), p_cpf varchar(11),  p_nascimento date , p_sexo varchar (2) , p_telefone varchar (10) , p_email varchar(25), p_id_cliente int(11)) 
+	begin	
+		update tbl_cliente
+			set 
+            nome = p_nome,
+			cpf = p_cpf,
+			nascimento = p_nascimento,  
+			sexo = p_sexo,
+			telefone = p_telefone,
+			email = p_email
+			where id_cliente = p_id_cliente;
+			select * from tbl_cliente where id_cliente = p_id_cliente;   # AQUI ESTA MOSTRANDO PRO FUNCIONARIO QUAL CLIENTE EU ATUALIZEI ==> COMO SE FOSSE UMA CONFERENCIA
+	end $$ 
+delimiter ;
+
+call sp_update_cliente ("petShop","123456-123","2021/12/01","M","7070-7070","petshop@gmail.com", 1);
+
+delimiter $$
+	CREATE PROCEDURE sp_delete_cliente (p_id_cliente int(11)) 
+	begin
+		## O CERTO SERIA FAZER UMA TBL DE LOG PRA GUARDAR OS USUARIOS ANTIGOS Q FOI APAGADOS ( FAZER UMA TRIGGER PRA ISSO )
+		update tbl_cliente
+			set 
+			cliente_deletado = 1
+			where id_cliente = p_id_cliente; 
+			select * from tbl_cliente where id_cliente = p_id_cliente;  ## TBM EXIBIR ISSO ==> PRO FUNCIONARIO CONFIRMAR O USUARIO Q FOI DELETADO.
+	end $$ 
+delimiter ;
+
+call sp_delete_cliente (1);
+
+delimiter $$
+	CREATE PROCEDURE sp_acha_cliente(p_id_cliente int)
+	begin 
+			select * from tbl_cliente where id_cliente = p_id_cliente; 
+	end $$
+delimiter ;
+
+call sp_acha_cliente (1);
+#########################################################
+#Animal
+
+delimiter $$ 
+	create procedure sp_insere_animal (p_nome_animal varchar (45) , p_especie varchar(45) , p_sexo varchar(45) , p_nascimento date , p_peso int(11) , p_id_cliente int(11))
+		begin
+			insert into tbl_animal(nome_animal, especie , sexo  , nascimento , peso , fk_id_cliente )
+				VALUES (p_nome_animal , p_especie  , p_sexo  , p_nascimento  , p_peso , (select id_cliente from tbl_cliente where id_cliente = p_id_cliente ));
+		end $$
+delimiter ;
+
+call sp_insere_animal("totó" , "cachorro" , "m" , "1995-05-15" , 20 , 1);
+
+delimiter $$ 
+	create procedure sp_update_animal (p_nome_animal varchar (45) , p_especie varchar(45) , p_sexo varchar(45) , p_nascimento date , p_peso int(11) , p_id_animal int(11))
+		begin
+			update tbl_animal
+				set  
+				nome_animal = p_nome_animal ,
+				especie = p_especie,
+				sexo = p_sexo ,
+				nascimento = p_nascimento ,
+				peso = p_peso  
+				#fk_id_cliente = (select id_cliente from tbl_cliente where id_cliente = p_id_cliente)
+				
+				where id_animal = p_id_animal;
+		end $$
+delimiter ;
+
+call sp_update_animal("dony", "cachorro" , "masculino ", "2020-05-02" , 15 , 2);
+
+delimiter $$
+	CREATE PROCEDURE sp_delete_animal (p_id_animal int(11)) ## obs > nao pode ser id_cliente > pq se nao vai apagar todos os bichos do id_cliente A INTENÇÃO É APAGAR APENAS UM POR VEZ.. ENTAO TENQ SER O ID ESPECIFICO DO ANIMAL
+	begin
+		## O CERTO SERIA FAZER UMA TBL DE LOG PRA GUARDAR OS USUARIOS ANTIGOS Q FOI APAGADOS ( FAZER UMA TRIGGER PRA ISSO )
+		update tbl_animal
+			set 
+			animal_deletado = 1
+			where id_animal = p_id_animal; 
+			select * from tbl_animal where id_animal = p_id_animal;  ## TBM EXIBIR ISSO ==> PRO FUNCIONARIO CONFIRMAR O USUARIO Q FOI DELETADO.
+	end $$ 
+delimiter ;
+
+call sp_delete_animal(1);
+
+delimiter $$
+	CREATE PROCEDURE sp_acha_animal(p_id_animal int)
+	begin
+		(select * from tbl_animal where id_animal = p_id_animal);
+	end $$
+delimiter ; 
+
+call sp_acha_animal (1);
+###############################################
+#Funcionario
+
+delimiter $$
+	 create procedure sp_insere_funcionario (p_nome varchar(45) , p_cpf varchar(14))
+		begin
+			insert into tbl_funcionario(nome, cpf)
+				VALUES (p_nome , p_cpf ) ;
+		end $$
+delimiter ;
+
+call sp_insere_funcionario ("carlos","429.482.134-20");
+
+delimiter $$ 
+	create procedure sp_update_funcionario (p_nome varchar (45) , p_cpf varchar(14), p_id_funcionario int(11))
+		begin
+			update tbl_funcionario
+				set  
+				nome = p_nome,
+				cpf = p_cpf
+				where id_funcionario = p_id_funcionario;
+		end $$
+delimiter ;
+
+CALL sp_update_funcionario("Rafael","234.144.532-14",1);
+
+delimiter $$
+	CREATE PROCEDURE sp_delete_funcionario (p_id_funcionario int(11))
+	begin
+		## O CERTO SERIA FAZER UMA TBL DE LOG PRA GUARDAR OS USUARIOS ANTIGOS Q FOI APAGADOS ( FAZER UMA TRIGGER PRA ISSO )
+		update tbl_funcionario
+			set 
+			funcionario_deletado = 1
+			where id_funcionario = p_id_funcionario;
+			select * from tbl_funcionario where id_funcionario = p_id_funcionario;  ## TBM EXIBIR ISSO ==> PRO FUNCIONARIO CONFIRMAR O USUARIO Q FOI DELETADO.
+	end $$ 
+delimiter ;
+
+CALL sp_delete_funcionario(1);
+
+delimiter $$
+	CREATE PROCEDURE sp_acha_funcionario(p_id_funcionario int)
+	begin
+		(select * from tbl_funcionario where id_funcionario = p_id_funcionario);
+	end $$
+delimiter ;
+
+CALL sp_acha_funcionario(1);
+
+###########################################3
+#Compra
+
+delimiter $$
+	 create procedure sp_insere_compra (p_valor_total decimal (7,2) , p_data_atual datetime , p_id_cliente_compra int(11), p_id_funcionario_compra int(11))
+		begin
+			insert into tbl_compra(valor_total, data_atual , fk_id_cliente_compra  , fk_id_funcionario_compra )
+				VALUES (p_valor_total , p_data_atual  , (select id_cliente from tbl_cliente where id_cliente = p_id_cliente_compra )  , (select id_cliente from tbl_cliente where id_cliente = p_id_funcionario_compra ) ) ;
+		end $$
+delimiter ;
+
+call sp_insere_compra(254.25 , NOW() , 1, 1 );
+
+delimiter $$ 
+	create procedure sp_update_compra (p_valor_total decimal (7,2) , p_data_atual datetime , p_id_cliente int(11), p_id_funcionario int(11))
+		begin
+			update tbl_compra
+				set  
+				valor_total = p_valor_total,
+				data_atual = p_data_atual
+				#where fk_id_cliente = (select id_cliente from tbl_cliente where id_cliente = p_id_cliente);
+				where fk_id_cliente_compra = (select id_cliente from tbl_cliente where id_cliente = p_id_cliente  AND fk_id_funcionario_compra = (select id_funcionario from tbl_funcionario where id_funcionario = p_id_funcionario) );
+		end $$
+delimiter ;
+
+CALL sp_update_compra(543.25,now(),1,1);
+
+delimiter $$
+	CREATE PROCEDURE sp_delete_compra (p_id_compra int(11))
+	begin
+		## O CERTO SERIA FAZER UMA TBL DE LOG PRA GUARDAR OS USUARIOS ANTIGOS Q FOI APAGADOS ( FAZER UMA TRIGGER PRA ISSO )
+		update tbl_compra
+			set 
+			compra_deletada = 1
+			where id_compra = p_id_compra;
+			
+			select * from tbl_compra where id_compra = p_id_compra;  ## TBM EXIBIR ISSO ==> PRO FUNCIONARIO CONFIRMAR O USUARIO Q FOI DELETADO.
+	end $$ 
+delimiter ;
+
+CALL sp_delete_compra (1);
+
+delimiter $$
+CREATE PROCEDURE sp_acha_compra(p_id_cliente int) ## aqui eu posso fazer ou pelo id do cliente / funcionario / ou da propria compra
+	begin
+		(select * from tbl_compra where fk_id_cliente_compra = p_id_cliente);
+	end $$
+delimiter ;
+
+CALL sp_acha_compra(1);
+
+##################################
+#Serviço
+
+delimiter $$
+ create procedure sp_insere_servico (p_descricao varchar (45) , p_valor_servico decimal(6,2) , p_tempo_servico time )
+	begin    
+		# 1° PREENCHE A TABELA DE SERVIÇOS 
+		insert into tbl_servico( descricao , valor_servico , tempo_servico)  
+			VALUES (p_descricao , p_valor_servico , p_tempo_servico  ) ;
+    end $$
+delimiter ;
+
+CALL sp_insere_servico("tosa" , 95.50 , "02:10:00" );
+CALL sp_insere_servico("banho" , 76.50 , "01:10:00" );
+CALL sp_insere_servico("manicure" , 65.50 , "01:20:00" );
+
+delimiter $$
+ create procedure sp_update_servico (p_id_servico int(11) , p_descricao varchar (45) , p_valor_servico decimal(6,2) , p_tempo_servico time )
+	begin    
+		update tbl_servico
+			set 
+            descricao = p_descricao , 
+            valor_servico = p_valor_servico  , 
+            tempo_servico = p_tempo_servico 
+            
+			where id_servico = p_id_servico ;
+    end $$
+delimiter ;
+
+CALL sp_update_servico (3, "massagem" , 85.50 , "02:10:00" );
+
+delimiter $$
+ create procedure sp_delete_servico (p_id_servico int(11) )
+	begin    
+		update tbl_servico
+			set 
+            servico_deletado = 1 
+            
+			where id_servico = p_id_servico ;
+    end $$
+delimiter ;
+
+CALL sp_delete_servico (1);
+
+delimiter $$
+ create procedure sp_acha_servico (p_id_servico int(11) )
+	begin    
+		select * from tbl_servico where id_servico = p_id_servico ;
+    end $$
+delimiter ;
+
+CALL sp_acha_servico(2);
+
+###############################
+#Animal Serviço
+
+delimiter $$
+create procedure sp_insere_animal_servico (p_id_animal int(11) , p_id_servico int(11), p_data_servico datetime  )
+	begin    	
+        # 1° COLOCA A DATA Q FOI O SERVIÇO E FALA QUEM FOI O ANIMAL E TBM QUAL SERVIÇO Q FOI 
+		insert into tbl_animal_servico (fk_id_animal , fk_id_servico , data_servico )
+			VALUES (p_id_animal , p_id_servico , p_data_servico ); ##=> DESSE JEITO EU ESCOLHO QUEM EU QUERO (dos animais e tbm dos serviços)
+    end $$
+delimiter ;
+
+CALL sp_insere_animal_servico (1,2,"2021-05-15 05:15:10");
+
+delimiter $$
+CREATE PROCEDURE sp_update_animal_servico( p_id_atendimento int(11) ,p_id_animal int(11) , p_id_servico int(11) , p_data_servico datetime)
+BEGIN 
+	UPDATE tbl_animal_servico 
+		SET 
+        fk_id_animal = p_id_animal ,
+        fk_id_servico = p_id_servico , 
+        data_servico = p_data_servico
+        
+		WHERE id_atendimento = p_id_atendimento ; 
+end $$
+delimiter ; 
+
+CALL sp_update_animal_servico (1,2,2,"2020-08-12 03:10:08");
+
+delimiter $$
+create procedure sp_delete_animal_servico (p_id_atendimento int(11))
+	begin
+		update tbl_animal_servico 
+			set animal_servico_deletado = 1
+            where id_atendimento = p_id_atendimento;
+	end $$
+delimiter ;
+
+call sp_delete_animal_servico(1);
+
+delimiter $$ 
+create procedure sp_acha_animal_servico (p_id_atendimento int (11))
+	begin
+		select * from tbl_animal_servico where id_atendimento = p_id_atendimento;
+	end $$
+delimiter ;
+
+call sp_acha_animal_servico (1);
+
+############################33####################3
+#Serviço Funcionario
+
+delimiter $$
+ create procedure sp_insere_servico_funcionario (p_id_servico int(11) , p_id_funcionario int(11) )
+	begin    
+		insert into tbl_servico_funcionario (fk_id_servico_funcionario , fk_id_funcionario) 
+			VALUES (p_id_servico , p_id_funcionario);
+   end $$
+delimiter ;
+
+CALL sp_insere_servico_funcionario(2,1);
+
+delimiter $$
+CREATE PROCEDURE sp_update_servico_funcionario( p_id_atendimento int(11) ,p_id_servico int(11) , p_id_funcionario int(11))
+BEGIN 
+	UPDATE tbl_servico_funcionario 
+		SET 
+        fk_id_servico_funcionario = p_id_servico ,
+        fk_id_funcionario = p_id_funcionario  
+        #### OBS TOP PRECISO CRIAR PARA TBL_SERVICO_FUNCIONARIO E PARA A TBL_ANIMAL_SERVICO 
+        ## UM ID_ATENDIMENTO ==> PQ AI EU CONSIGO ATUALIZAR AS CHAVES ESTRANGEIRAS.. RELACIONANDO COM ESSE ID
+        ## OBS 2 ==> NO UPDATE DA TBL_COMPRAS se eu quiser atualizar as chaves estrangeiras tbm é só fazer o mesmo esquema pegar o id_compra
+		WHERE id_atendimento = p_id_atendimento ; 
+end $$
+delimiter ; 
+
+CALL sp_update_servico_funcionario(1,2,1);
+
+delimiter $$
+CREATE PROCEDURE sp_delete_servico_funcionario( p_id_atendimento int(11))
+BEGIN 
+	UPDATE tbl_servico_funcionario 
+		SET 
+        servico_deletado_funcionario = 1
+       WHERE id_atendimento = p_id_atendimento ; 
+end $$
+delimiter ; 
+
+CALL sp_delete_servico_funcionario(1);
+
+delimiter $$
+CREATE PROCEDURE sp_acha_servico_funcionario( p_id_atendimento int(11))
+BEGIN 
+	select * from tbl_servico_funcionario WHERE id_atendimento = p_id_atendimento ; 
+end $$
+delimiter ; 
+
+CALL sp_acha_servico_funcionario(1);

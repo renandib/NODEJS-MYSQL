@@ -1,0 +1,18 @@
+#Criando as triggers
+DELIMITER $
+	CREATE TRIGGER trg_clientes_antigos before update on tbl_cliente
+		FOR EACH ROW
+			BEGIN
+				INSERT INTO tbl_log_update_cliente(FK_log_id_cliente , cpf_log_cliente , nome_log_cliente , nascimento_log_cliente , sexo_log_cliente , telefone_log_cliente , email_log_cliente , dt_alteracao)
+				VALUES(OLD.id_cliente, OLD.cpf , OLD.nome , OLD.nascimento , OLD.sexo , OLD.telefone , OLD.email ,  default);
+			END$
+delimiter ; 
+
+DELIMITER $
+	CREATE TRIGGER trg_usuarios_antigos before update on tbl_usuarios
+		FOR EACH ROW
+			BEGIN
+				INSERT INTO tbl_log_update_usuarios(FK_log_id_usuario, nome_log_usuario, email_log_usuario , senha_log_usuario, dt_alteracao)
+				VALUES(OLD.id_usuario, OLD.nome ,  OLD.email , OLD.senha,  default);
+			END$
+delimiter ;

@@ -1,0 +1,107 @@
+create database petShop;
+
+use petShop;
+
+#Criação das tabelas
+create table IF NOT EXISTS tbl_usuarios (
+	id_usuario integer auto_increment primary key,
+    email varchar(35) not null,
+    senha varchar(64) not null,
+    estatus varchar(01) default 0,
+    nome varchar(30) not null
+);
+
+CREATE TABLE IF NOT EXISTS tbl_cliente (
+	id_cliente int(11) primary key auto_increment not null,
+	nome varchar(45) not null,
+	cpf varchar(14) not null,
+	nascimento DATE ,
+	sexo char(1) not null,
+	telefone varchar(45) not null,
+	email varchar(45) not null,
+	cliente_deletado boolean default 0  
+);
+
+CREATE TABLE IF NOT EXISTS tbl_animal (
+	id_animal int (11) primary key auto_increment,
+	nome_animal VARCHAr(45) not null,
+	especie varchar(45) not null,
+	sexo varchar(45) not null,
+	nascimento date,
+	peso int(11) not null,
+	fk_id_cliente int(11),
+	animal_deletado boolean default 0,
+	constraint fk_id_cliente foreign key (fk_id_cliente) references tbl_cliente(id_cliente)
+);
+
+CREATE TABLE IF NOT EXISTS tbl_servico(
+	id_servico int(11) primary key auto_increment,
+	descricao varchar(45) not null,
+	valor_servico decimal(6,2) not null,
+	tempo_servico time,
+	servico_deletado boolean default 0
+);
+
+CREATE TABLE IF NOT EXISTS tbl_animal_servico(  
+	id_atendimento int primary key auto_increment, ### SE EU QUISER ATUALIZAR AS CHAVES ESTRANGEIRAS ==> É SÓ RELACIONAR COM ISSO
+	data_servico DATETIME,
+    fk_id_animal int(11),
+    fk_id_servico int(11),
+    animal_servico_deletado boolean default 0,
+    
+    constraint fk_id_animal foreign key (fk_id_animal) references tbl_animal (id_animal),
+    constraint fk_id_servico foreign key (fk_id_servico) references tbl_servico(id_servico)
+);
+
+CREATE TABLE IF NOT EXISTS tbl_funcionario ( 
+	id_funcionario int(11) primary key auto_increment,
+	nome varchar(45) not null,
+	cpf varchar(14) not null,
+	funcionario_deletado boolean default 0
+);
+
+CREATE TABLE IF NOT EXISTS tbl_servico_funcionario (
+	id_atendimento int(11) primary key auto_increment,  ### SE EU QUISER ATUALIZAR AS CHAVES ESTRANGEIRAS ==> É SÓ RELACIONAR COM ISSO
+	fk_id_servico_funcionario int(11),
+    fk_id_funcionario int(11),
+    servico_deletado_funcionario boolean default 0,
+    
+    constraint fk_id_servico_funcionario foreign key (fk_id_servico_funcionario) references tbl_servico (id_servico),
+	constraint fk_id_funcionario foreign key (fk_id_funcionario) references tbl_funcionario (id_funcionario)
+);
+
+CREATE TABLE IF NOT EXISTS tbl_compra(	
+	id_compra int(11) primary key auto_increment,
+	valor_total decimal(7,2) not null,
+	data_atual DATETIME default now(),
+	fk_id_cliente_compra int(11),
+	fk_id_funcionario_compra int(11),
+	compra_deletada boolean default 0,
+		
+	constraint fk_id_cliente_compra foreign key (fk_id_cliente_compra) references tbl_cliente(id_cliente),
+	constraint fk_id_funcionario_compra foreign key (fk_id_funcionario_compra) references tbl_funcionario(id_funcionario)
+);
+
+#Tabela de log para fazer uma trigger
+CREATE TABLE IF NOT EXISTS tbl_log_update_cliente(
+	id_log_cliente int primary key auto_increment,
+	cpf_log_cliente varchar(25) not null,
+	nome_log_cliente varchar (35) not null, 
+	nascimento_log_cliente date not null,  
+	sexo_log_cliente char(1) not null,
+	telefone_log_cliente varchar (20) not null,
+	email_log_cliente varchar (30) not null,
+	dt_alteracao datetime default now(),
+	FK_log_id_cliente int not null,
+	constraint FK_log_id_cliente foreign key (FK_log_id_cliente) references tbl_cliente(id_cliente) 
+);
+
+CREATE TABLE IF NOT EXISTS tbl_log_update_usuarios(
+	id_log_usuario int primary key auto_increment,
+	nome_log_usuario varchar (30) not null,
+	email_log_usuario varchar (35) not null,
+    senha_log_usuario varchar (34),
+	dt_alteracao datetime default now(),
+    FK_log_id_usuario int not null,
+	constraint FK_log_id_usuario foreign key (FK_log_id_usuario) references tbl_usuarios(id_usuario) 
+);

@@ -1,0 +1,24 @@
+#Criando as Views
+CREATE VIEW vw_mostra_cliente AS
+	select * from tbl_cliente;
+    
+CREATE VIEW  vw_todos_animais as
+		select * from tbl_animal;
+	
+CREATE VIEW vw_todos_funcionarios as 
+	SELECT * FROM tbl_funcionario;
+    
+CREATE VIEW vw_todas_compras as 
+	select * from tbl_compra;
+    
+CREATE VIEW vw_todos_servicos 
+	as SELECT * FROM tbl_servico;
+
+create view vw_animal_servico as 
+	select * from tbl_animal_servico;
+    
+create view vw_acha_servico_funcionario as
+	select * from tbl_servico_funcionario;
+    
+create view vw_acha_user as
+	select * from tbl_usuarios;
